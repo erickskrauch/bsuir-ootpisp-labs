@@ -1,5 +1,7 @@
 package by.bsuir.ootpsp.task1.models;
 
+import by.bsuir.ootpsp.task1.IDateAndCopy;
+
 import java.time.LocalDateTime;
 
 /**
@@ -9,13 +11,13 @@ import java.time.LocalDateTime;
   свойство типа int, в котором хранится оценка;
   свойство типа System.DateTime для даты экзамена
  */
-public class Exam {
+public class Exam implements IDateAndCopy {
 
     public String subjectName;
 
     public int mark;
 
-    public LocalDateTime date;
+    private LocalDateTime date;
 
     public Exam() {
         this("Unknown", 0, LocalDateTime.MIN);
@@ -29,6 +31,18 @@ public class Exam {
 
     public String toString() {
         return String.format("%s with mark %d at %s", this.subjectName, this.mark, this.date.toString());
+    }
+
+    public Object DeepCopy() {
+        return new Exam(this.subjectName, this.mark, this.date);
+    }
+
+    public LocalDateTime getDateTime() {
+        return this.date;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.date = dateTime;
     }
 
 }

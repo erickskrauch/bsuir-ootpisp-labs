@@ -8,40 +8,53 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-/**
- * В методе Main()
- 5. Создать один объект типа Student, преобразовать данные в текстовый
- вид с помощью метода ToShortString() и вывести данные.
- 6. Вывести значения индексатора для значений индекса Education.Specialist,
- Education.Bachelor и Education.SecondEducation.
- 7. Присвоить значения всем определенным в типе Student свойствам,
- преобразовать данные в текстовый вид с помощью метода ToString() и
- вывести данные.
- 8. C помощью метода AddExams( params Exam*+ ) добавить элементы в
- список экзаменов и вывести данные объекта Student, используя метод
- ToString().
- 9. Сравнить время выполнения операций с элементами одномерного,
- двумерного прямоугольного и двумерного ступенчатого массивов с
- одинаковым числом элементов типа Exam.
- */
 public class Main {
 
     public static void main(String[] args) {
-        Person person = new Person("Rick", "Sanchez");
-        Student student = new Student(person, Education.Specialist, 681061);
-        System.out.println("First student: " + student.toShortString());
-        System.out.println("Is Specialist: " + student.isEducationEqual(Education.Specialist));
-        System.out.println("Is Bachelor: " + student.isEducationEqual(Education.Bachelor));
-        System.out.println("Is SecondEducation: " + student.isEducationEqual(Education.SecondEducation));
+        Person person1 = new Person("Vlad", "Pisetskiy");
+        Person person2 = new Person("Vlad", "Pisetskiy");
+
+        System.out.println("Is links equal: " + (person1 == person2));
+        System.out.println("Is persons equal: " + person1.equals(person2));
+
+        Student student = new Student(person1, Education.Specialist, 161);
 
         student.addExams(Arrays.asList(
+            new Exam("Physics", 2, LocalDateTime.of(2017, 5, 11, 17, 0)),
             new Exam("Math", 7, LocalDateTime.of(2017, 6, 15, 16, 0)),
             new Exam("OAIP", 10, LocalDateTime.of(2017, 6, 18, 17, 0, 0)),
             new Exam("SIAOD", 10, LocalDateTime.of(2017, 6, 30, 18, 0, 0))
         ));
 
-        System.out.println("Student with exams:");
+        student.setTests(Arrays.asList(
+            new Test("религоведение", true),
+            new Test("философия", true),
+            new Test("бег на 100 метров", false)
+        ));
+
+        System.out.println("Student with exams and tests:");
         System.out.println(student);
+
+        System.out.println("Student as person: " + student.getPerson());
+
+        Student studentCopy = (Student)student.DeepCopy();
+        studentCopy.setPerson(new Person("Alexander", "Lukashenko"));
+        System.out.println("Not cloned student: " + student.toShortString());
+        System.out.println("Cloned student: " + studentCopy.toShortString());
+
+        try {
+            student.setGroupNumber(10000);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+
+        System.out.println("All students exams and tests:");
+        student.getPassed().forEachRemaining(p -> System.out.println(p.toString()));
+
+        System.out.println();
+
+        System.out.println("All students exams with mark greater than 3:");
+        student.getPassedExamsWithMarkGreaterThan(3).forEachRemaining(e -> System.out.println(e.toString()));
     }
 
     private void testPerformance() {

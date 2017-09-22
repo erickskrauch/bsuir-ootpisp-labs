@@ -1,7 +1,12 @@
 package by.bsuir.ootpsp.task1.models;
 
+import by.bsuir.ootpsp.task1.IDeepCopy;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * В классе Student определить
@@ -21,9 +26,7 @@ import java.util.List;
  значениями всех полей класса без списка экзаменов, но со значением
  среднего балла.
  */
-public class Student {
-
-    private Person person;
+public class Student extends Person implements IDeepCopy {
 
     private Education education;
 
@@ -31,22 +34,26 @@ public class Student {
 
     private List<Exam> exams = new ArrayList<>();
 
+    private List<Test> tests = new ArrayList<>();
+
     public Student() {
         this(new Person("unknown", "unknown"), Education.Specialist, 0);
     }
 
+    // TODO: мы недовольны этим дерьмом
     public Student(Person person, Education education, int groupNumber) {
-        this.person = person;
+        super(person.getName(), person.getSurname());
         this.education = education;
-        this.groupNumber = groupNumber;
+        this.setGroupNumber(groupNumber);
     }
 
     public Person getPerson() {
-        return person;
+        return new Person(this.getName(), this.getSurname());
     }
 
     public void setPerson(Person person) {
-        this.person = person;
+        this.name = person.getName();
+        this.surname = person.getSurname();
     }
 
     public Education getEducation() {
@@ -62,15 +69,27 @@ public class Student {
     }
 
     public void setGroupNumber(int groupNumber) {
+        if (groupNumber <= 100 || 599 < groupNumber) {
+            throw new IllegalArgumentException("Illegal griup number");
+        }
+
         this.groupNumber = groupNumber;
     }
 
     public List<Exam> getExams() {
-        return exams;
+        return this.exams;
     }
 
     public void setExams(List<Exam> exams) {
         this.exams = exams;
+    }
+
+    public List<Test> getTests() {
+        return this.tests;
+    }
+
+    public void setTests(List<Test> tests) {
+        this.tests = tests;
     }
 
     public double getAverageMark() {
@@ -85,11 +104,29 @@ public class Student {
         this.exams.addAll(exams);
     }
 
+    public Iterator getPassed() {
+        return Stream.concat(this.exams.stream(), this.tests.stream()).iterator();
+    }
+
+    public Iterator<Exam> getPassedExamsWithMarkGreaterThan(int mark) {
+        if (mark < 0 || 10 < mark) {
+            throw new IllegalArgumentException("Illegal mark value");
+        }
+
+        return this.exams.stream().filter(exam -> exam.mark > mark).iterator();
+    }
+
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(this.buildToStringHeader());
+        result.append("Exams:\n");
         for (Exam exam : this.exams) {
             result.append(String.format("* %s\n", exam));
+        }
+
+        result.append("\nTests:\n");
+        for (Test test : this.tests) {
+            result.append(String.format("* %s\n", test));
         }
 
         return result.toString();
@@ -104,7 +141,15 @@ public class Student {
     }
 
     private String buildToStringHeader() {
-        return String.format("%s (%d, %s)\n", this.person.toString(), this.groupNumber, this.education.name());
+        return String.format("%s (%d, %s)\n", super.toString(), this.groupNumber, this.education.name());
+    }
+
+    public Object DeepCopy() {
+        Student student =  new Student(new Person(this.getName(), this.getSurname()), this.education, this.groupNumber);
+        student.setExams(this.getExams().stream().map(e -> (Exam)e.DeepCopy()).collect(Collectors.toList()));
+        student.setTests(this.getTests().stream().map(e -> (Test)e.DeepCopy()).collect(Collectors.toList()));
+
+        return student;
     }
 
 }
