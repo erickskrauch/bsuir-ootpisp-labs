@@ -108,6 +108,10 @@ public class Student extends Person implements IDeepCopy {
         return Stream.concat(this.exams.stream(), this.tests.stream()).iterator();
     }
 
+    public Iterator getPassedNames() {
+        return new StudentEnumerator(this.exams, this.tests);
+    }
+
     public Iterator<Exam> getPassedExamsWithMarkGreaterThan(int mark) {
         if (mark < 0 || 10 < mark) {
             throw new IllegalArgumentException("Illegal mark value");
@@ -150,6 +154,42 @@ public class Student extends Person implements IDeepCopy {
         student.setTests(this.getTests().stream().map(e -> (Test)e.DeepCopy()).collect(Collectors.toList()));
 
         return student;
+    }
+
+    public class StudentEnumerator implements Iterator<String> {
+
+        private final List<Exam> exams;
+        private final List<Test> tests;
+
+        private int iteratorIndex = 0;
+        private boolean iterateOverTests = false;
+
+        private StudentEnumerator(List<Exam> exams, List<Test> tests) {
+            this.exams = exams;
+            this.tests = tests;
+        }
+
+        public boolean hasNext() {
+            if (!this.iterateOverTests && this.exams.size() <= this.iteratorIndex) {
+                this.iterateOverTests = true;
+                this.iteratorIndex = 0;
+            }
+
+            if (this.iterateOverTests) {
+                return this.tests.size() > this.iteratorIndex;
+            } else {
+                return this.exams.size() > this.iteratorIndex;
+            }
+        }
+
+        public String next() {
+            if (this.iterateOverTests) {
+                return this.tests.get(iteratorIndex++).subject;
+            } else {
+                return this.exams.get(iteratorIndex++).subjectName;
+            }
+        }
+
     }
 
 }
