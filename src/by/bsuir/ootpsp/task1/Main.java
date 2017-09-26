@@ -35,26 +35,8 @@ public class Main {
         System.out.println("Student with exams and tests:");
         System.out.println(student);
 
-        System.out.println("Student as person: " + student.getPerson());
-
-        Student studentCopy = (Student)student.DeepCopy();
-        studentCopy.setPerson(new Person("Alexander", "Lukashenko"));
-        System.out.println("Not cloned student: " + student.toShortString());
-        System.out.println("Cloned student: " + studentCopy.toShortString());
-
-        try {
-            student.setGroupNumber(10000);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
         System.out.println("All students exams and tests:");
-        student.getPassed().forEachRemaining(p -> System.out.println(p.toString()));
-
-        System.out.println();
-
-        System.out.println("All students exams with mark greater than 3:");
-        student.getPassedExamsWithMarkGreaterThan(3).forEachRemaining(e -> System.out.println(e.toString()));
+        student.getPassedNames().forEachRemaining(p -> System.out.println(p.toString()));
     }
 
     private void testPerformance() {
