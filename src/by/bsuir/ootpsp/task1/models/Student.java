@@ -67,7 +67,7 @@ public class Student extends Person implements IDeepCopy {
         return groupNumber;
     }
 
-    private void setGroupNumber(int groupNumber) {
+    public void setGroupNumber(int groupNumber) {
         if (groupNumber <= 100 || 599 < groupNumber) {
             throw new IllegalArgumentException("Illegal griup number");
         }
@@ -79,11 +79,11 @@ public class Student extends Person implements IDeepCopy {
         return this.exams;
     }
 
-    private void setExams(List<Exam> exams) {
+    public void setExams(List<Exam> exams) {
         this.exams = exams;
     }
 
-    List<Test> getTests() {
+    public List<Test> getTests() {
         return this.tests;
     }
 
@@ -91,11 +91,11 @@ public class Student extends Person implements IDeepCopy {
         this.tests = tests;
     }
 
-    double getAverageMark() {
+    public double getAverageMark() {
         return this.exams.stream().mapToInt(e -> e.mark).average().orElse(0);
     }
 
-    boolean isEducationEqual(Education education) {
+    public boolean isEducationEqual(Education education) {
         return this.education == education;
     }
 
@@ -136,7 +136,7 @@ public class Student extends Person implements IDeepCopy {
         return result.toString();
     }
 
-    String toShortString() {
+    public String toShortString() {
         return this.buildToStringHeader() +
                 "\n" +
                 String.format("Average mark: %2.1f\n", this.getAverageMark());

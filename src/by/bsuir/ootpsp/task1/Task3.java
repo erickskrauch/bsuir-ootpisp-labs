@@ -15,30 +15,41 @@ import java.util.List;
 class Task3 {
 
     private static final int STUDENTS_COUNT = 3;
+
     private static final String[] NAMES = new String[] {"Lavrentiy", "Iosif", "Vladimir"};
+
     private static final String[] SURNAMES = new String[] {"Beria", "Stalin", "Lenin"};
+
     private static final LocalDate[] BIRTH_DATES = new LocalDate[] {
             LocalDate.of(1899, 3, 29),
             LocalDate.of(1878, 12, 18),
             LocalDate.of(1870, 4, 22),
     };
+
     private static final Education[] EDUCATIONS = new Education[] {
             Education.Specialist,
             Education.Specialist,
             Education.Bachelor
     };
+
     private static final int GROUP = 123;
+
     private static final int EXAMS_COUNT = 2;
+
     private static final String[] SUBJECTS = new String[] {"Economics", "Repressions"};
+
     private static final int[][] MARKS = new int[][] {
             {3, 6, 9},
             {8, 9, 4}
     };
+
     private static final LocalDateTime[] PASS_DATES = new LocalDateTime[] {
             LocalDateTime.of(1917, 10, 23, 15, 0),
             LocalDateTime.of(1917, 10, 28, 15, 0)
     };
+
     private static final String TEST = "Being nice";
+
     private static final boolean[] TEST_PASSES = new boolean[] {false, false, true};
 
     void execute() {
@@ -46,7 +57,7 @@ class Task3 {
         StudentCollection collection = createCollection();
         printCollectionSorted(collection);
         printCalculatedValues(collection);
-
+        printSearchTimeForCollections();
         System.out.println("----------Task 3 ended----------");
     }
 
@@ -102,5 +113,48 @@ class Task3 {
                 System.out.println(sameMarkCollection.toShortString());
             }
         }
+    }
+
+    private void printSearchTimeForCollections() {
+        int collectionsSize = 1_000_000;
+        TestCollections test = new TestCollections(collectionsSize);
+        System.out.println("Collections size is " + collectionsSize + "\n");
+
+        System.out.println("Searching first element from collections...");
+        long[] firstElementSearchTime = test.getSearchTimeForEachCollection(
+                new Person("name_" + 0, "surname_" + 0, LocalDate.MIN)
+        );
+        printSearchTime(firstElementSearchTime);
+        System.out.println();
+
+        System.out.println("Searching middle element from collections...");
+        int middleElementIndex = collectionsSize / 2;
+        long[] middleElementSearchTime = test.getSearchTimeForEachCollection(
+                new Person("name_" + middleElementIndex, "surname_" + middleElementIndex, LocalDate.MIN)
+        );
+        printSearchTime(middleElementSearchTime);
+        System.out.println();
+
+        System.out.println("Searching last element from collections...");
+        int lastElementIndex = collectionsSize - 1;
+        long[] lastElementSearchTime = test.getSearchTimeForEachCollection(
+                new Person("name_" + lastElementIndex, "surname_" + lastElementIndex, LocalDate.MIN)
+        );
+        printSearchTime(lastElementSearchTime);
+        System.out.println();
+
+        System.out.println("Searching non existed element from collections...");
+        long[] nonExistedElementSearchTime = test.getSearchTimeForEachCollection(
+                new Person("name_" + -1, "surname_" + -1, LocalDate.MIN)
+        );
+        printSearchTime(nonExistedElementSearchTime);
+        System.out.println();
+    }
+
+    private void printSearchTime(long[] searchTimeForCollections) {
+        System.out.println("Search time for person list: " + searchTimeForCollections[0]);
+        System.out.println("Search time for string list: " + searchTimeForCollections[1]);
+        System.out.println("Search time for person to student map: " + searchTimeForCollections[2]);
+        System.out.println("Search time for string to student map: " + searchTimeForCollections[3]);
     }
 }
