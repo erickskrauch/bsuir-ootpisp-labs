@@ -4,24 +4,12 @@ import by.bsuir.ootpsp.task1.IDeepCopy;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * В новой версии класса Student сохранить все остальные поля, свойства и
- * методы из предыдущей версии класса, внести необходимые исправления в
- * код свойств и методов из-за изменения типов полей для списков зачетов и
- * экзаменов.
- * Определить вспомогательный класс, реализующий интерфейс
- * System.Collections.Generic.IComparer<Student>, который можно использовать
- * для сравнения объектов типа Student по среднему баллу.
- */
 public class Student extends Person implements IDeepCopy {
-
-    static final Comparator<Student> AVG_MAR_COMPARATOR = Comparator.comparing(Student::getAverageMark);
 
     private Education education;
 
@@ -87,7 +75,7 @@ public class Student extends Person implements IDeepCopy {
     }
 
     public double getAverageMark() {
-        return this.exams.stream().mapToInt(e -> e.mark).average().orElse(0);
+        return this.exams.stream().mapToInt(Exam::getMark).average().orElse(0);
     }
 
     public boolean isEducationEqual(Education education) {
@@ -111,7 +99,7 @@ public class Student extends Person implements IDeepCopy {
             throw new IllegalArgumentException("Illegal mark value");
         }
 
-        return this.exams.stream().filter(exam -> exam.mark > mark).iterator();
+        return this.exams.stream().filter(exam -> exam.getMark() > mark).iterator();
     }
 
     public String toString() {
@@ -155,6 +143,18 @@ public class Student extends Person implements IDeepCopy {
         return student;
     }
 
+    public void sortExamsBySubject() {
+        this.exams.sort(null);
+    }
+
+    public void sortExamsByMark() {
+        this.exams.sort(Exam.MARK_COMPARATOR);
+    }
+
+    public void sortExamsByPassDate() {
+        this.exams.sort(Exam.PASS_DATE_COMPARATOR);
+    }
+
     public class StudentEnumerator implements Iterator<String> {
 
         private final List<Exam> exams;
@@ -185,7 +185,7 @@ public class Student extends Person implements IDeepCopy {
             if (this.iterateOverTests) {
                 return this.tests.get(iteratorIndex++).subject;
             } else {
-                return this.exams.get(iteratorIndex++).subjectName;
+                return this.exams.get(iteratorIndex++).getSubject();
             }
         }
 

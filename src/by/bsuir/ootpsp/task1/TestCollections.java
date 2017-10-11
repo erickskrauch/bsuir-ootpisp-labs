@@ -1,57 +1,50 @@
 package by.bsuir.ootpsp.task1;
 
-import by.bsuir.ootpsp.task1.models.Education;
-import by.bsuir.ootpsp.task1.models.Person;
-import by.bsuir.ootpsp.task1.models.Student;
-
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-public class TestCollections {
+public class TestCollections<TKey, TValue> {
 
-    private static Student createStudent(int param) {
-        return new Student(
-            new Person("name_" + param, "surname_" + param, LocalDate.MIN),
-            Education.Specialist,
-            300
-        );
-    }
+    private Function<Integer, Map.Entry<TKey, TValue>> entryGenerator;
 
-    private List<Person> persons = new ArrayList<>();
+    private List<TKey> tKeys = new ArrayList<>();
 
-    private List<String> personsInStrings = new ArrayList<>();
+    private List<String> strings = new ArrayList<>();
 
-    private Map<Person, Student> personStudentMap = new HashMap<>();
+    private Map<TKey, TValue> keyValueMap = new HashMap<>();
 
-    private Map<String, Student> stringStudentMap = new HashMap<>();
+    private Map<String, TValue> stringValueMap = new HashMap<>();
 
-    public TestCollections(int collectionsSize) {
+    public TestCollections(int collectionsSize, Function<Integer, Map.Entry<TKey, TValue>> entryGenerator) {
+        this.entryGenerator = entryGenerator;
         for (int i = 0; i < collectionsSize; i++) {
-            Student student = createStudent(i);
-            persons.add(student.getPerson());
-            personsInStrings.add(student.getPerson().toString());
-            personStudentMap.put(student.getPerson(), student);
-            stringStudentMap.put(student.getPerson().toString(), student);
+            Map.Entry<TKey, TValue> entry = this.entryGenerator.apply(i);
+            tKeys.add(entry.getKey());
+            strings.add(entry.getKey().toString());
+            keyValueMap.put(entry.getKey(), entry.getValue());
+            stringValueMap.put(entry.getKey().toString(), entry.getValue());
         }
     }
 
-    public long[] getSearchTimeForEachCollection(Person person) {
-        long[] searchTimeArray = new long[4];
-        searchTimeArray[0] = getExecutionTime(() -> persons.indexOf(person));
-        searchTimeArray[1] = getExecutionTime(() -> personsInStrings.indexOf(person.toString()));
-        searchTimeArray[2] = getExecutionTime(() -> personStudentMap.get(person));
-        searchTimeArray[3] = getExecutionTime(() -> stringStudentMap.get(person.toString()));
+    public long[] getSearchTimeForEachCollection(int searchElementIndex) {
+        Map.Entry<TKey, TValue> searchEntry = this.entryGenerator.apply(searchElementIndex);
+        long[] searchTimeArray = new long[5];
+        searchTimeArray[0] = getExecutionTime(() -> tKeys.contains(searchEntry.getKey()));
+        searchTimeArray[1] = getExecutionTime(() -> strings.contains(searchEntry.getKey().toString()));
+        searchTimeArray[2] = getExecutionTime(() -> keyValueMap.containsKey(searchEntry.getKey()));
+        searchTimeArray[3] = getExecutionTime(() -> stringValueMap.containsKey(searchEntry.getKey().toString()));
+        searchTimeArray[4] = getExecutionTime(() -> keyValueMap.containsValue(searchEntry.getValue()));
 
         return searchTimeArray;
     }
 
     private long getExecutionTime(Action action) {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         action.execute();
-        long endTime = System.currentTimeMillis();
+        long endTime = System.nanoTime();
 
         return endTime - startTime;
     }

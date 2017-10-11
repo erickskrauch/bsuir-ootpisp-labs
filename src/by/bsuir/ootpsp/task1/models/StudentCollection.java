@@ -1,29 +1,37 @@
 package by.bsuir.ootpsp.task1.models;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-public class StudentCollection {
+public class StudentCollection<T> {
 
-    private List<Student> students = new ArrayList<>();
+    private StudentKeySelector<T> keySelector;
+
+    private Map<T, Student> studentsMap;
+
+    public StudentCollection(StudentKeySelector<T> keySelector) {
+        this.keySelector = keySelector;
+        this.studentsMap = new HashMap<>();
+    }
 
     public void addDefaults() {
         for (int i = 0; i < 3; i++) {
-            this.students.add(new Student());
+            Student student = new Student();
+            this.studentsMap.put(this.keySelector.apply(student), student);
         }
     }
 
     public void addStudents(Student[] newStudents) {
-        this.students.addAll(Arrays.asList(newStudents));
+        Arrays.stream(newStudents).forEach(student -> this.studentsMap.put(this.keySelector.apply(student), student));
     }
 
     @Override
     public String toString() {
         final StringBuilder builder = new StringBuilder();
-        this.students.forEach(student -> builder.append(student).append("\n"));
+        this.studentsMap.values().forEach(student -> builder.append(student).append("\n"));
 
         return builder.toString();
     }
@@ -31,7 +39,7 @@ public class StudentCollection {
     public String toShortString() {
         final StringBuilder builder = new StringBuilder();
 
-        this.students.forEach(student -> builder
+        this.studentsMap.values().forEach(student -> builder
             .append(student.toShortString())
             .append("Exams count: ").append(student.getExams().size())
             .append("\n")
@@ -42,36 +50,24 @@ public class StudentCollection {
         return builder.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    public void sortBySurname() {
-        Collections.sort(this.students);
-    }
-
-    public void sortByBirthDate() {
-        this.students.sort(Person.BIRTH_DATE_COMPARATOR);
-    }
-
-    public void sortByAvgMark() {
-        this.students.sort(Student.AVG_MAR_COMPARATOR);
-    }
-
     public double getMaxAverageMark() {
-        return this.students.stream()
+        return this.studentsMap.values().stream()
             .mapToDouble(Student::getAverageMark)
             .max()
             .orElse(0);
     }
 
-    public List<Student> getSpecialists() {
-        return this.students.stream()
-            .filter(student -> student.isEducationEqual(Education.Specialist))
+    //TODO: hate this
+    public List<Map.Entry<T, Student>> findByEducation(Education education) {
+        return this.studentsMap.entrySet().stream()
+            .filter(entry -> entry.getValue().isEducationEqual(Education.Specialist))
             .collect(Collectors.toList());
     }
 
-    public List<Student> getWithAvgMarkEqualTo(int mark) {
-        return this.students.stream()
-            .filter(student -> mark <= student.getAverageMark() && student.getAverageMark() < (mark + 1))
-            .collect(Collectors.toList());
+    //TODO: i really hate this, but it is our task
+    public Map<Education, List<Map.Entry<T, Student>>> groupByEducation() {
+        return this.studentsMap.entrySet().stream()
+            .collect(Collectors.groupingBy(entry -> entry.getValue().getEducation()));
     }
 
 }
