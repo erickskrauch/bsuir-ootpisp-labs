@@ -43,10 +43,10 @@ public class Person implements IDeepCopy, Comparable {
 
     public String toString() {
         return String.format(
-                "%s %s (%s)",
-                this.getName(),
-                this.getSurname(),
-                BIRTH_DATE_FORMATTER.format(this.birthDate));
+            "%s %s (%s)",
+            this.getName(),
+            this.getSurname(),
+            BIRTH_DATE_FORMATTER.format(this.birthDate));
     }
 
     public Object DeepCopy() {
@@ -55,7 +55,7 @@ public class Person implements IDeepCopy, Comparable {
 
     @Override
     public int compareTo(Object o) {
-        return SURNAME_COMPARATOR.compare(this, (Person)o);
+        return SURNAME_COMPARATOR.compare(this, (Person) o);
     }
 
     public int hashCode() {

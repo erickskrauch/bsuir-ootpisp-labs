@@ -31,13 +31,12 @@ public class StudentCollection {
     public String toShortString() {
         final StringBuilder builder = new StringBuilder();
 
-        this.students.forEach(
-                student -> builder
-                        .append(student.toShortString())
-                        .append("Exams count: ").append(student.getExams().size())
-                        .append("\n")
-                        .append("Tests count: ").append(student.getTests().size())
-                        .append("\n\n")
+        this.students.forEach(student -> builder
+            .append(student.toShortString())
+            .append("Exams count: ").append(student.getExams().size())
+            .append("\n")
+            .append("Tests count: ").append(student.getTests().size())
+            .append("\n\n")
         );
 
         return builder.toString();
@@ -58,20 +57,21 @@ public class StudentCollection {
 
     public double getMaxAverageMark() {
         return this.students.stream()
-                .mapToDouble(Student::getAverageMark)
-                .max()
-                .orElse(0);
+            .mapToDouble(Student::getAverageMark)
+            .max()
+            .orElse(0);
     }
 
     public List<Student> getSpecialists() {
         return this.students.stream()
-                .filter(student -> student.isEducationEqual(Education.Specialist))
-                .collect(Collectors.toList());
+            .filter(student -> student.isEducationEqual(Education.Specialist))
+            .collect(Collectors.toList());
     }
 
     public List<Student> getWithAvgMarkEqualTo(int mark) {
         return this.students.stream()
-                .filter(student -> mark <= student.getAverageMark() && student.getAverageMark() < (mark + 1))
-                .collect(Collectors.toList());
+            .filter(student -> mark <= student.getAverageMark() && student.getAverageMark() < (mark + 1))
+            .collect(Collectors.toList());
     }
+
 }

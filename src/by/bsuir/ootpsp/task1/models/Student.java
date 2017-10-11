@@ -11,13 +11,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- В новой версии класса Student сохранить все остальные поля, свойства и
- методы из предыдущей версии класса, внести необходимые исправления в
- код свойств и методов из-за изменения типов полей для списков зачетов и
- экзаменов.
- Определить вспомогательный класс, реализующий интерфейс
- System.Collections.Generic.IComparer<Student>, который можно использовать
- для сравнения объектов типа Student по среднему баллу.
+ * В новой версии класса Student сохранить все остальные поля, свойства и
+ * методы из предыдущей версии класса, внести необходимые исправления в
+ * код свойств и методов из-за изменения типов полей для списков зачетов и
+ * экзаменов.
+ * Определить вспомогательный класс, реализующий интерфейс
+ * System.Collections.Generic.IComparer<Student>, который можно использовать
+ * для сравнения объектов типа Student по среднему баллу.
  */
 public class Student extends Person implements IDeepCopy {
 
@@ -32,14 +32,9 @@ public class Student extends Person implements IDeepCopy {
     private List<Test> tests = new ArrayList<>();
 
     Student() {
-        this(
-                new Person("unknown", "unknown", LocalDate.MIN),
-                Education.Specialist,
-                0
-        );
+        this(new Person("unknown", "unknown", LocalDate.MIN), Education.Specialist, 0);
     }
 
-    // TODO: мы недовольны этим дерьмом
     public Student(Person person, Education education, int groupNumber) {
         super(person.getName(), person.getSurname(), person.getBirthDate());
         this.education = education;
@@ -69,7 +64,7 @@ public class Student extends Person implements IDeepCopy {
 
     public void setGroupNumber(int groupNumber) {
         if (groupNumber <= 100 || 599 < groupNumber) {
-            throw new IllegalArgumentException("Illegal griup number");
+            throw new IllegalArgumentException("Illegal group number");
         }
 
         this.groupNumber = groupNumber;
@@ -138,24 +133,24 @@ public class Student extends Person implements IDeepCopy {
 
     public String toShortString() {
         return this.buildToStringHeader() +
-                "\n" +
-                String.format("Average mark: %2.1f\n", this.getAverageMark());
+            "\n" +
+            String.format("Average mark: %2.1f\n", this.getAverageMark());
     }
 
     private String buildToStringHeader() {
         return super.toString() +
-                "\n" +
-                String.format("group: %d, education: %s", this.groupNumber, this.education);
+            "\n" +
+            String.format("group: %d, education: %s", this.groupNumber, this.education);
     }
 
     public Object DeepCopy() {
-        Student student =  new Student(
-                new Person(this.getName(), this.getSurname(),this.getBirthDate()),
-                this.education,
-                this.groupNumber
+        Student student = new Student(
+            new Person(this.getName(), this.getSurname(), this.getBirthDate()),
+            this.education,
+            this.groupNumber
         );
-        student.setExams(this.getExams().stream().map(e -> (Exam)e.DeepCopy()).collect(Collectors.toList()));
-        student.setTests(this.getTests().stream().map(e -> (Test)e.DeepCopy()).collect(Collectors.toList()));
+        student.setExams(this.getExams().stream().map(e -> (Exam) e.DeepCopy()).collect(Collectors.toList()));
+        student.setTests(this.getTests().stream().map(e -> (Test) e.DeepCopy()).collect(Collectors.toList()));
 
         return student;
     }

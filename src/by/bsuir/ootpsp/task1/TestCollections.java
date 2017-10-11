@@ -60,6 +60,7 @@ public class TestCollections {
     private interface Action {
 
         void execute();
-        
+
     }
+
 }
