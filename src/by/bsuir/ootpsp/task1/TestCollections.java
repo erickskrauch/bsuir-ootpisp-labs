@@ -14,9 +14,9 @@ public class TestCollections {
 
     private static Student createStudent(int param) {
         return new Student(
-                new Person("name_" + param, "surname_" + param, LocalDate.MIN ),
-                Education.Specialist,
-                300
+            new Person("name_" + param, "surname_" + param, LocalDate.MIN),
+            Education.Specialist,
+            300
         );
     }
 
@@ -44,6 +44,7 @@ public class TestCollections {
         searchTimeArray[1] = getExecutionTime(() -> personsInStrings.indexOf(person.toString()));
         searchTimeArray[2] = getExecutionTime(() -> personStudentMap.get(person));
         searchTimeArray[3] = getExecutionTime(() -> stringStudentMap.get(person.toString()));
+
         return searchTimeArray;
     }
 
@@ -51,6 +52,7 @@ public class TestCollections {
         long startTime = System.currentTimeMillis();
         action.execute();
         long endTime = System.currentTimeMillis();
+
         return endTime - startTime;
     }
 
@@ -58,5 +60,6 @@ public class TestCollections {
     private interface Action {
 
         void execute();
+        
     }
 }

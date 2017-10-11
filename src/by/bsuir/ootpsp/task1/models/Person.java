@@ -12,10 +12,10 @@ public class Person implements IDeepCopy, Comparable {
     private static final DateTimeFormatter BIRTH_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     private static final Comparator<Person> SURNAME_COMPARATOR = Comparator
-            .nullsLast(Comparator.comparing(Person::getSurname));
+        .nullsLast(Comparator.comparing(Person::getSurname));
 
     static final Comparator<Person> BIRTH_DATE_COMPARATOR = Comparator
-            .nullsLast(Comparator.comparing(Person::getBirthDate));
+        .nullsLast(Comparator.comparing(Person::getBirthDate));
 
     String name;
 
@@ -29,15 +29,15 @@ public class Person implements IDeepCopy, Comparable {
         this.birthDate = birthDate;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    String getSurname() {
+    public String getSurname() {
         return surname;
     }
 
-    LocalDate getBirthDate() {
+    public LocalDate getBirthDate() {
         return birthDate;
     }
 
@@ -55,8 +55,7 @@ public class Person implements IDeepCopy, Comparable {
 
     @Override
     public int compareTo(Object o) {
-        Person other = (Person)o;
-        return SURNAME_COMPARATOR.compare(this, other);
+        return SURNAME_COMPARATOR.compare(this, (Person)o);
     }
 
     public int hashCode() {
