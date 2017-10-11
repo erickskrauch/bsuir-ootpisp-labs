@@ -117,7 +117,7 @@ public class Main {
 
         System.out.println("Searching first element from collections...");
         long[] firstElementSearchTime = test.getSearchTimeForEachCollection(
-                new Person("name_" + 0, "surname_" + 0, LocalDate.MIN)
+            new Person("name_" + 0, "surname_" + 0, LocalDate.MIN)
         );
         printSearchTime(firstElementSearchTime);
         System.out.println();
@@ -125,7 +125,7 @@ public class Main {
         System.out.println("Searching middle element from collections...");
         int middleElementIndex = collectionsSize / 2;
         long[] middleElementSearchTime = test.getSearchTimeForEachCollection(
-                new Person("name_" + middleElementIndex, "surname_" + middleElementIndex, LocalDate.MIN)
+            new Person("name_" + middleElementIndex, "surname_" + middleElementIndex, LocalDate.MIN)
         );
         printSearchTime(middleElementSearchTime);
         System.out.println();
@@ -133,14 +133,14 @@ public class Main {
         System.out.println("Searching last element from collections...");
         int lastElementIndex = collectionsSize - 1;
         long[] lastElementSearchTime = test.getSearchTimeForEachCollection(
-                new Person("name_" + lastElementIndex, "surname_" + lastElementIndex, LocalDate.MIN)
+            new Person("name_" + lastElementIndex, "surname_" + lastElementIndex, LocalDate.MIN)
         );
         printSearchTime(lastElementSearchTime);
         System.out.println();
 
         System.out.println("Searching non existed element from collections...");
         long[] nonExistedElementSearchTime = test.getSearchTimeForEachCollection(
-                new Person("name_" + -1, "surname_" + -1, LocalDate.MIN)
+            new Person("name_" + -1, "surname_" + -1, LocalDate.MIN)
         );
         printSearchTime(nonExistedElementSearchTime);
         System.out.println();
