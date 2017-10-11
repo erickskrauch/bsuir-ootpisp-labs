@@ -2,31 +2,26 @@ package by.bsuir.ootpsp.task1.models;
 
 import by.bsuir.ootpsp.task1.IDeepCopy;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * В классе Student определить
-  свойство типа double ( только с методом get), в котором вычисляется
- средний балл как среднее значение оценок в списке сданных экзаменов;
-  индексатор булевского типа (только с методом get) с одним параметром
- типа Education; значение индексатора равно true, если значение поля с
- 10
- формой обучения студента совпадает со значением индекса, и false в
- противном случае;
-  метод void AddExams ( params Exam [] ) для добавления элементов в
- список экзаменов;
-  перегруженную версию виртуального метода string ToString() для
- формирования строки со значениями всех полей класса, включая список
- экзаменов;
-  виртуальный метод string ToShortString(), который формирует строку со
- значениями всех полей класса без списка экзаменов, но со значением
- среднего балла.
+ * В новой версии класса Student сохранить все остальные поля, свойства и
+ * методы из предыдущей версии класса, внести необходимые исправления в
+ * код свойств и методов из-за изменения типов полей для списков зачетов и
+ * экзаменов.
+ * Определить вспомогательный класс, реализующий интерфейс
+ * System.Collections.Generic.IComparer<Student>, который можно использовать
+ * для сравнения объектов типа Student по среднему баллу.
  */
 public class Student extends Person implements IDeepCopy {
+
+    static final Comparator<Student> AVG_MAR_COMPARATOR = Comparator.comparing(Student::getAverageMark);
 
     private Education education;
 
@@ -36,19 +31,18 @@ public class Student extends Person implements IDeepCopy {
 
     private List<Test> tests = new ArrayList<>();
 
-    public Student() {
-        this(new Person("unknown", "unknown"), Education.Specialist, 0);
+    Student() {
+        this(new Person("unknown", "unknown", LocalDate.MIN), Education.Specialist, 0);
     }
 
-    // TODO: мы недовольны этим дерьмом
     public Student(Person person, Education education, int groupNumber) {
-        super(person.getName(), person.getSurname());
+        super(person.getName(), person.getSurname(), person.getBirthDate());
         this.education = education;
         this.setGroupNumber(groupNumber);
     }
 
     public Person getPerson() {
-        return new Person(this.getName(), this.getSurname());
+        return new Person(this.getName(), this.getSurname(), this.getBirthDate());
     }
 
     public void setPerson(Person person) {
@@ -70,7 +64,7 @@ public class Student extends Person implements IDeepCopy {
 
     public void setGroupNumber(int groupNumber) {
         if (groupNumber <= 100 || 599 < groupNumber) {
-            throw new IllegalArgumentException("Illegal griup number");
+            throw new IllegalArgumentException("Illegal group number");
         }
 
         this.groupNumber = groupNumber;
@@ -123,6 +117,7 @@ public class Student extends Person implements IDeepCopy {
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(this.buildToStringHeader());
+        result.append("\n");
         result.append("Exams:\n");
         for (Exam exam : this.exams) {
             result.append(String.format("* %s\n", exam));
@@ -137,21 +132,25 @@ public class Student extends Person implements IDeepCopy {
     }
 
     public String toShortString() {
-        StringBuilder result = new StringBuilder();
-        result.append(this.buildToStringHeader());
-        result.append(String.format("Average mark: %2.1f\n", this.getAverageMark()));
-
-        return result.toString();
+        return this.buildToStringHeader() +
+            "\n" +
+            String.format("Average mark: %2.1f\n", this.getAverageMark());
     }
 
     private String buildToStringHeader() {
-        return String.format("%s (%d, %s)\n", super.toString(), this.groupNumber, this.education.name());
+        return super.toString() +
+            "\n" +
+            String.format("group: %d, education: %s", this.groupNumber, this.education);
     }
 
     public Object DeepCopy() {
-        Student student =  new Student(new Person(this.getName(), this.getSurname()), this.education, this.groupNumber);
-        student.setExams(this.getExams().stream().map(e -> (Exam)e.DeepCopy()).collect(Collectors.toList()));
-        student.setTests(this.getTests().stream().map(e -> (Test)e.DeepCopy()).collect(Collectors.toList()));
+        Student student = new Student(
+            new Person(this.getName(), this.getSurname(), this.getBirthDate()),
+            this.education,
+            this.groupNumber
+        );
+        student.setExams(this.getExams().stream().map(e -> (Exam) e.DeepCopy()).collect(Collectors.toList()));
+        student.setTests(this.getTests().stream().map(e -> (Test) e.DeepCopy()).collect(Collectors.toList()));
 
         return student;
     }

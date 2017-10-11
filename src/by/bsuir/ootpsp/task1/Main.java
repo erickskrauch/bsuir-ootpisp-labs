@@ -2,55 +2,155 @@ package by.bsuir.ootpsp.task1;
 
 import by.bsuir.ootpsp.task1.models.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Main {
 
+    private static final int STUDENTS_COUNT = 3;
+
+    private static final String[] NAMES = new String[] {"Lavrentiy", "Iosif", "Vladimir"};
+
+    private static final String[] SURNAMES = new String[] {"Beria", "Stalin", "Lenin"};
+
+    private static final LocalDate[] BIRTH_DATES = new LocalDate[] {
+        LocalDate.of(1899, 3, 29),
+        LocalDate.of(1878, 12, 18),
+        LocalDate.of(1870, 4, 22),
+    };
+
+    private static final Education[] EDUCATIONS = new Education[] {
+        Education.Specialist,
+        Education.Specialist,
+        Education.Bachelor
+    };
+
+    private static final int GROUP = 123;
+
+    private static final int EXAMS_COUNT = 2;
+
+    private static final String[] SUBJECTS = new String[] {"Economics", "Repressions"};
+
+    private static final int[][] MARKS = new int[][] {
+        {3, 6, 9},
+        {8, 9, 4}
+    };
+
+    private static final LocalDateTime[] PASS_DATES = new LocalDateTime[] {
+        LocalDateTime.of(1917, 10, 23, 15, 0),
+        LocalDateTime.of(1917, 10, 28, 15, 0)
+    };
+
+    private static final String TEST = "Being nice";
+
+    private static final boolean[] TEST_PASSES = new boolean[] {false, false, true};
+
     public static void main(String[] args) {
-        Person person1 = new Person("Vlad", "Pisetskiy");
-        Person person2 = new Person("Vlad", "Pisetskiy");
-
-        System.out.println("Is links equal: " + (person1 == person2));
-        System.out.println("Is persons equal: " + person1.equals(person2));
-
-        Student student = new Student(person1, Education.Specialist, 161);
-
-        student.addExams(Arrays.asList(
-            new Exam("Physics", 2, LocalDateTime.of(2017, 5, 11, 17, 0)),
-            new Exam("Math", 7, LocalDateTime.of(2017, 6, 15, 16, 0)),
-            new Exam("OAIP", 10, LocalDateTime.of(2017, 6, 18, 17, 0, 0)),
-            new Exam("SIAOD", 10, LocalDateTime.of(2017, 6, 30, 18, 0, 0))
-        ));
-
-        student.setTests(Arrays.asList(
-            new Test("религоведение", true),
-            new Test("философия", true),
-            new Test("бег на 100 метров", false)
-        ));
-
-        System.out.println("Student with exams and tests:");
-        System.out.println(student);
-
-        System.out.println("All students exams and tests:");
-        student.getPassedNames().forEachRemaining(p -> System.out.println(p.toString()));
+        System.out.println("\n----------Task 3 started----------\n");
+        StudentCollection collection = createCollection();
+        printCollectionSorted(collection);
+        printCalculatedValues(collection);
+        printSearchTimeForCollections();
+        System.out.println("----------Task 3 ended----------");
     }
 
-    private void testPerformance() {
-        // TODO: it really don't working
-        final int size = 10000;
-        List<Exam> examList = new Random().ints(size).boxed().map(i -> new Exam("", i, LocalDateTime.MIN)).collect(Collectors.toList());
-        Exam[] arr = examList.toArray(new Exam[size]);
-        Exam[][] matrix = new Exam[100][100];
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i] = new Exam[100];
-            for (int j = 0; j < matrix[i].length; j++) {
-                matrix[i][j] = arr[i * matrix.length + j];
+    private static StudentCollection createCollection() {
+        Student[] students = new Student[STUDENTS_COUNT];
+        for (int i = 0; i < STUDENTS_COUNT; i++) {
+            students[i] = new Student(new Person(NAMES[i], SURNAMES[i], BIRTH_DATES[i]), EDUCATIONS[i], GROUP);
+            students[i].setTests(Collections.singletonList(new Test(TEST, TEST_PASSES[i])));
+            for (int j = 0; j < EXAMS_COUNT; j++) {
+                students[i].getExams().add(new Exam(SUBJECTS[j], MARKS[j][i], PASS_DATES[j]));
             }
         }
+
+        StudentCollection collection = new StudentCollection();
+        collection.addStudents(students);
+
+        System.out.println("Initial students collection:");
+        System.out.println(collection.toShortString());
+
+        return collection;
+    }
+
+    private static void printCollectionSorted(StudentCollection collection) {
+        System.out.println("Students sorted by surname:");
+        collection.sortBySurname();
+        System.out.println(collection.toShortString());
+
+        System.out.println("Students sorted by birth date:");
+        collection.sortByBirthDate();
+        System.out.println(collection.toShortString());
+
+        System.out.println("Students sorted by avg mark:");
+        collection.sortByAvgMark();
+        System.out.println(collection.toShortString());
+    }
+
+    private static void printCalculatedValues(StudentCollection collection) {
+        System.out.println("Max avg mark:");
+        System.out.println(collection.getMaxAverageMark());
+        System.out.println();
+
+        System.out.println("Specialists:");
+        StudentCollection specialistsCollection = new StudentCollection();
+        specialistsCollection.addStudents(collection.getSpecialists().toArray(new Student[0]));
+        System.out.println(specialistsCollection.toShortString());
+
+        for (int i = 0; i <= 10; i++) {
+            List<Student> sameMarkStudents = collection.getWithAvgMarkEqualTo(i);
+            if (!sameMarkStudents.isEmpty()) {
+                StudentCollection sameMarkCollection = new StudentCollection();
+                sameMarkCollection.addStudents(sameMarkStudents.toArray(new Student[0]));
+                System.out.println("Students with avg mark equal to " + i);
+                System.out.println(sameMarkCollection.toShortString());
+            }
+        }
+    }
+
+    private static void printSearchTimeForCollections() {
+        int collectionsSize = 1_000_000;
+        TestCollections test = new TestCollections(collectionsSize);
+        System.out.println("Collections size is " + collectionsSize + "\n");
+
+        System.out.println("Searching first element from collections...");
+        long[] firstElementSearchTime = test.getSearchTimeForEachCollection(
+            new Person("name_" + 0, "surname_" + 0, LocalDate.MIN)
+        );
+        printSearchTime(firstElementSearchTime);
+        System.out.println();
+
+        System.out.println("Searching middle element from collections...");
+        int middleElementIndex = collectionsSize / 2;
+        long[] middleElementSearchTime = test.getSearchTimeForEachCollection(
+            new Person("name_" + middleElementIndex, "surname_" + middleElementIndex, LocalDate.MIN)
+        );
+        printSearchTime(middleElementSearchTime);
+        System.out.println();
+
+        System.out.println("Searching last element from collections...");
+        int lastElementIndex = collectionsSize - 1;
+        long[] lastElementSearchTime = test.getSearchTimeForEachCollection(
+            new Person("name_" + lastElementIndex, "surname_" + lastElementIndex, LocalDate.MIN)
+        );
+        printSearchTime(lastElementSearchTime);
+        System.out.println();
+
+        System.out.println("Searching non existed element from collections...");
+        long[] nonExistedElementSearchTime = test.getSearchTimeForEachCollection(
+            new Person("name_" + -1, "surname_" + -1, LocalDate.MIN)
+        );
+        printSearchTime(nonExistedElementSearchTime);
+        System.out.println();
+    }
+
+    private static void printSearchTime(long[] searchTimeForCollections) {
+        System.out.println("Search time for person list: " + searchTimeForCollections[0]);
+        System.out.println("Search time for string list: " + searchTimeForCollections[1]);
+        System.out.println("Search time for person to student map: " + searchTimeForCollections[2]);
+        System.out.println("Search time for string to student map: " + searchTimeForCollections[3]);
     }
 
 }
