@@ -137,7 +137,6 @@ public class Main {
             System.out.println(key);
             value.stream().map(Map.Entry::getValue).map(Student::toShortString).forEach(System.out::println);
         });
-
     }
 
     private static void printSearchTimeForCollections() {

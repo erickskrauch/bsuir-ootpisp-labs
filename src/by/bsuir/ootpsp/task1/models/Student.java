@@ -120,15 +120,11 @@ public class Student extends Person implements IDeepCopy {
     }
 
     public String toShortString() {
-        return this.buildToStringHeader() +
-            "\n" +
-            String.format("Average mark: %2.1f\n", this.getAverageMark());
+        return String.format("%s\nAverage mark: %2.1f\n", this.buildToStringHeader(), this.getAverageMark());
     }
 
     private String buildToStringHeader() {
-        return super.toString() +
-            "\n" +
-            String.format("group: %d, education: %s", this.groupNumber, this.education);
+        return String.format("%s\ngroup: %d, education: %s", super.toString(), this.groupNumber, this.education);
     }
 
     public Object DeepCopy() {
