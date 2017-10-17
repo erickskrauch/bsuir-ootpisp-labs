@@ -2,7 +2,9 @@ package by.bsuir.ootpsp.task1.models;
 
 import by.bsuir.ootpsp.task1.IDeepCopy;
 
-public class Test implements IDeepCopy {
+import java.io.Serializable;
+
+public class Test implements IDeepCopy<Test>, Serializable {
 
     public final String subject;
 
@@ -21,7 +23,7 @@ public class Test implements IDeepCopy {
         return String.format("%s is %s", this.subject, this.isPassed ? "passed" : "not passed");
     }
 
-    public Object DeepCopy() {
+    public Test deepCopy() {
         return new Test(this.subject, this.isPassed);
     }
 

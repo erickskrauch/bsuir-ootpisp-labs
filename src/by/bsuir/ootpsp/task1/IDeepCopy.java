@@ -1,7 +1,7 @@
 package by.bsuir.ootpsp.task1;
 
-public interface IDeepCopy {
+public interface IDeepCopy<T> {
 
-    Object DeepCopy();
+    T deepCopy();
 
 }

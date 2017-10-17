@@ -5,27 +5,16 @@ import by.bsuir.ootpsp.task1.models.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.List;
 
 public class Main {
 
-    private static final int STUDENTS_COUNT = 3;
+    private static final String NAME = "Lavrentiy";
 
-    private static final String[] NAMES = new String[] {"Lavrentiy", "Iosif", "Vladimir"};
+    private static final String SURNAME = "Beria";
 
-    private static final String[] SURNAMES = new String[] {"Beria", "Stalin", "Lenin"};
+    private static final LocalDate BIRTH_DATE = LocalDate.of(1899, 3, 29);
 
-    private static final LocalDate[] BIRTH_DATES = new LocalDate[] {
-        LocalDate.of(1899, 3, 29),
-        LocalDate.of(1878, 12, 18),
-        LocalDate.of(1870, 4, 22),
-    };
-
-    private static final Education[] EDUCATIONS = new Education[] {
-        Education.Specialist,
-        Education.Specialist,
-        Education.Bachelor
-    };
+    private static final Education EDUCATION = Education.Specialist;
 
     private static final int GROUP = 123;
 
@@ -33,10 +22,7 @@ public class Main {
 
     private static final String[] SUBJECTS = new String[] {"Economics", "Repressions"};
 
-    private static final int[][] MARKS = new int[][] {
-        {3, 6, 9},
-        {8, 9, 4}
-    };
+    private static final int[][] MARKS = new int[][] { {3}, {8} };
 
     private static final LocalDateTime[] PASS_DATES = new LocalDateTime[] {
         LocalDateTime.of(1917, 10, 23, 15, 0),
@@ -45,112 +31,29 @@ public class Main {
 
     private static final String TEST = "Being nice";
 
-    private static final boolean[] TEST_PASSES = new boolean[] {false, false, true};
+    private static final boolean TEST_PASS = false;
 
     public static void main(String[] args) {
-        System.out.println("\n----------Task 3 started----------\n");
-        StudentCollection collection = createCollection();
-        printCollectionSorted(collection);
-        printCalculatedValues(collection);
-        printSearchTimeForCollections();
-        System.out.println("----------Task 3 ended----------");
+        System.out.println("\n----------Task 5 started----------\n");
+        Student student = createStudent();
+        System.out.println("Original student:");
+        System.out.println(student);
+        System.out.println("Copied student:");
+        Student copied = student.deepCopy();
+        System.out.println(copied);
+        student.addFromConsole();
+        System.out.println(student);
+        System.out.println("----------Task 5 ended----------");
     }
 
-    private static StudentCollection createCollection() {
-        Student[] students = new Student[STUDENTS_COUNT];
-        for (int i = 0; i < STUDENTS_COUNT; i++) {
-            students[i] = new Student(new Person(NAMES[i], SURNAMES[i], BIRTH_DATES[i]), EDUCATIONS[i], GROUP);
-            students[i].setTests(Collections.singletonList(new Test(TEST, TEST_PASSES[i])));
-            for (int j = 0; j < EXAMS_COUNT; j++) {
-                students[i].getExams().add(new Exam(SUBJECTS[j], MARKS[j][i], PASS_DATES[j]));
-            }
+    private static Student createStudent() {
+        Student student = new Student(new Person(NAME, SURNAME, BIRTH_DATE), EDUCATION, GROUP);
+        student.setTests(Collections.singletonList(new Test(TEST, TEST_PASS)));
+        for (int j = 0; j < EXAMS_COUNT; j++) {
+            student.getExams().add(new Exam(SUBJECTS[j], MARKS[j][0], PASS_DATES[j]));
         }
 
-        StudentCollection collection = new StudentCollection();
-        collection.addStudents(students);
-
-        System.out.println("Initial students collection:");
-        System.out.println(collection.toShortString());
-
-        return collection;
-    }
-
-    private static void printCollectionSorted(StudentCollection collection) {
-        System.out.println("Students sorted by surname:");
-        collection.sortBySurname();
-        System.out.println(collection.toShortString());
-
-        System.out.println("Students sorted by birth date:");
-        collection.sortByBirthDate();
-        System.out.println(collection.toShortString());
-
-        System.out.println("Students sorted by avg mark:");
-        collection.sortByAvgMark();
-        System.out.println(collection.toShortString());
-    }
-
-    private static void printCalculatedValues(StudentCollection collection) {
-        System.out.println("Max avg mark:");
-        System.out.println(collection.getMaxAverageMark());
-        System.out.println();
-
-        System.out.println("Specialists:");
-        StudentCollection specialistsCollection = new StudentCollection();
-        specialistsCollection.addStudents(collection.getSpecialists().toArray(new Student[0]));
-        System.out.println(specialistsCollection.toShortString());
-
-        for (int i = 0; i <= 10; i++) {
-            List<Student> sameMarkStudents = collection.getWithAvgMarkEqualTo(i);
-            if (!sameMarkStudents.isEmpty()) {
-                StudentCollection sameMarkCollection = new StudentCollection();
-                sameMarkCollection.addStudents(sameMarkStudents.toArray(new Student[0]));
-                System.out.println("Students with avg mark equal to " + i);
-                System.out.println(sameMarkCollection.toShortString());
-            }
-        }
-    }
-
-    private static void printSearchTimeForCollections() {
-        int collectionsSize = 1_000_000;
-        TestCollections test = new TestCollections(collectionsSize);
-        System.out.println("Collections size is " + collectionsSize + "\n");
-
-        System.out.println("Searching first element from collections...");
-        long[] firstElementSearchTime = test.getSearchTimeForEachCollection(
-            new Person("name_" + 0, "surname_" + 0, LocalDate.MIN)
-        );
-        printSearchTime(firstElementSearchTime);
-        System.out.println();
-
-        System.out.println("Searching middle element from collections...");
-        int middleElementIndex = collectionsSize / 2;
-        long[] middleElementSearchTime = test.getSearchTimeForEachCollection(
-            new Person("name_" + middleElementIndex, "surname_" + middleElementIndex, LocalDate.MIN)
-        );
-        printSearchTime(middleElementSearchTime);
-        System.out.println();
-
-        System.out.println("Searching last element from collections...");
-        int lastElementIndex = collectionsSize - 1;
-        long[] lastElementSearchTime = test.getSearchTimeForEachCollection(
-            new Person("name_" + lastElementIndex, "surname_" + lastElementIndex, LocalDate.MIN)
-        );
-        printSearchTime(lastElementSearchTime);
-        System.out.println();
-
-        System.out.println("Searching non existed element from collections...");
-        long[] nonExistedElementSearchTime = test.getSearchTimeForEachCollection(
-            new Person("name_" + -1, "surname_" + -1, LocalDate.MIN)
-        );
-        printSearchTime(nonExistedElementSearchTime);
-        System.out.println();
-    }
-
-    private static void printSearchTime(long[] searchTimeForCollections) {
-        System.out.println("Search time for person list: " + searchTimeForCollections[0]);
-        System.out.println("Search time for string list: " + searchTimeForCollections[1]);
-        System.out.println("Search time for person to student map: " + searchTimeForCollections[2]);
-        System.out.println("Search time for string to student map: " + searchTimeForCollections[3]);
+        return student;
     }
 
 }

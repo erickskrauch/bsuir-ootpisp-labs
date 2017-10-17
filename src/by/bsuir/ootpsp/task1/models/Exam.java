@@ -1,7 +1,9 @@
 package by.bsuir.ootpsp.task1.models;
 
-import by.bsuir.ootpsp.task1.IDateAndCopy;
+import by.bsuir.ootpsp.task1.IDateTime;
+import by.bsuir.ootpsp.task1.IDeepCopy;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -11,7 +13,7 @@ import java.time.LocalDateTime;
   свойство типа int, в котором хранится оценка;
   свойство типа System.DateTime для даты экзамена
  */
-public class Exam implements IDateAndCopy {
+public class Exam implements IDeepCopy<Exam>, IDateTime, Serializable {
 
     public String subjectName;
 
@@ -33,7 +35,7 @@ public class Exam implements IDateAndCopy {
         return String.format("%s with mark %d at %s", this.subjectName, this.mark, this.date.toString());
     }
 
-    public Object DeepCopy() {
+    public Exam deepCopy() {
         return new Exam(this.subjectName, this.mark, this.date);
     }
 
