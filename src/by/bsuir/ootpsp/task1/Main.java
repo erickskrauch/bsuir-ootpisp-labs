@@ -2,9 +2,11 @@ package by.bsuir.ootpsp.task1;
 
 import by.bsuir.ootpsp.task1.models.*;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Scanner;
 
 public class Main {
 
@@ -35,14 +37,39 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("\n----------Task 5 started----------\n");
+        
         Student student = createStudent();
         System.out.println("Original student:");
         System.out.println(student);
         System.out.println("Copied student:");
         Student copied = student.deepCopy();
         System.out.println(copied);
+        
+        System.out.println("Enter file name:");
+        Scanner scanner = new Scanner(System.in);
+        String filename = scanner.nextLine();
+        File file = new File(filename);
+        if (!file.exists()) {
+            System.out.println("File doesn't exist. Will create new one.");
+            student.save(filename);
+        } else {
+            System.out.println("Will load student from file.");
+            student.load(filename);
+            System.out.println("Student loaded from file:");
+            System.out.println(student);
+        }
+        
         student.addFromConsole();
+        student.save(filename);
         System.out.println(student);
+        
+        System.out.println("Reload student from file");
+        System.out.println(student);
+        Student.load(filename, student);
+        student.addFromConsole();
+        Student.save(filename, student);
+        System.out.println(student);
+        
         System.out.println("----------Task 5 ended----------");
     }
 
