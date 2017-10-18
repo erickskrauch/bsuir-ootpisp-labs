@@ -1,15 +1,28 @@
 package by.bsuir.ootpsp.task1.models;
 
-import by.bsuir.ootpsp.task1.IDeepCopy;
-
+import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 import java.util.stream.Stream;
 
-public class Student extends Person implements IDeepCopy {
+public class Student extends Person implements Serializable {
+
+    public static boolean save(String filename, Student student) {
+        Objects.requireNonNull(student);
+
+        return student.save(filename);
+    }
+
+    public static boolean load(String filename, Student student) {
+        Objects.requireNonNull(student);
+
+        return student.load(filename);
+    }
+
+    static final Comparator<Student> AVG_MAR_COMPARATOR = Comparator.comparing(Student::getAverageMark);
 
     private Education education;
 
@@ -75,7 +88,7 @@ public class Student extends Person implements IDeepCopy {
     }
 
     public double getAverageMark() {
-        return this.exams.stream().mapToInt(Exam::getMark).average().orElse(0);
+        return this.exams.stream().mapToInt(e -> e.mark).average().orElse(0);
     }
 
     public boolean isEducationEqual(Education education) {
@@ -99,7 +112,7 @@ public class Student extends Person implements IDeepCopy {
             throw new IllegalArgumentException("Illegal mark value");
         }
 
-        return this.exams.stream().filter(exam -> exam.getMark() > mark).iterator();
+        return this.exams.stream().filter(exam -> exam.mark > mark).iterator();
     }
 
     public String toString() {
@@ -120,35 +133,100 @@ public class Student extends Person implements IDeepCopy {
     }
 
     public String toShortString() {
-        return String.format("%s\nAverage mark: %2.1f\n", this.buildToStringHeader(), this.getAverageMark());
+        return this.buildToStringHeader() +
+            "\n" +
+            String.format("Average mark: %2.1f\n", this.getAverageMark());
     }
 
     private String buildToStringHeader() {
-        return String.format("%s\ngroup: %d, education: %s", super.toString(), this.groupNumber, this.education);
+        return super.toString() +
+            "\n" +
+            String.format("group: %d, education: %s", this.groupNumber, this.education);
     }
 
-    public Object DeepCopy() {
-        Student student = new Student(
-            new Person(this.getName(), this.getSurname(), this.getBirthDate()),
-            this.education,
-            this.groupNumber
-        );
-        student.setExams(this.getExams().stream().map(e -> (Exam) e.DeepCopy()).collect(Collectors.toList()));
-        student.setTests(this.getTests().stream().map(e -> (Test) e.DeepCopy()).collect(Collectors.toList()));
+    public Student deepCopy() {
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectOutputStream studentOut = new ObjectOutputStream(out);
+            studentOut.writeObject(this);
+            ObjectInputStream studentIn = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
 
-        return student;
+            return (Student)studentIn.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("Exception while copying student", e);
+        }
     }
 
-    public void sortExamsBySubject() {
-        this.exams.sort(null);
+    public boolean save(String filename) {
+        try(FileOutputStream out = new FileOutputStream(new File(filename))) {
+            ObjectOutputStream studentOut = new ObjectOutputStream(out);
+            studentOut.writeObject(this);
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
-    public void sortExamsByMark() {
-        this.exams.sort(Exam.MARK_COMPARATOR);
+    public boolean load(String filename) {
+        try(FileInputStream in = new FileInputStream(new File(filename))) {
+            ObjectInputStream studentIn = new ObjectInputStream(in);
+            Student loaded = (Student)studentIn.readObject();
+            this.name = loaded.name;
+            this.surname = loaded.surname;
+            this.birthDate = loaded.birthDate;
+            this.education = loaded.education;
+            this.groupNumber = loaded.groupNumber;
+            this.exams = loaded.exams;
+            this.tests = loaded.tests;
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
-    public void sortExamsByPassDate() {
-        this.exams.sort(Exam.PASS_DATE_COMPARATOR);
+    public boolean addFromConsole() {
+        System.out.println("Enter exam data (format - <subject name>#<mark[0 - 10]>#<pass date[D.M.YYYY HH:mm]>):");
+        Scanner scanner = new Scanner(System.in);
+        String[] data = scanner.nextLine().split("#");
+
+        if (data.length < 3) {
+            System.out.println("Invalid exam data");
+
+            return false;
+        }
+
+        String subject = data[0];
+        if (subject.trim().isEmpty()) {
+            System.out.println("Invalid subject data");
+    
+            return false;
+        }
+
+        if (!data[1].matches("\\d|10")) {
+            System.out.println("Invalid mark data");
+
+            return false;
+        }
+
+        int mark = Integer.parseInt(data[1]);
+
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("d.M.y HH:mm");
+        LocalDateTime passDate = null;
+        try {
+            passDate = LocalDateTime.parse(data[2], dtf);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid pass date data");
+
+            return false;
+        }
+
+        this.exams.add(new Exam(subject, mark, passDate));
+        
+        return true;
     }
 
     public class StudentEnumerator implements Iterator<String> {
@@ -181,7 +259,7 @@ public class Student extends Person implements IDeepCopy {
             if (this.iterateOverTests) {
                 return this.tests.get(iteratorIndex++).subject;
             } else {
-                return this.exams.get(iteratorIndex++).getSubject();
+                return this.exams.get(iteratorIndex++).subjectName;
             }
         }
 

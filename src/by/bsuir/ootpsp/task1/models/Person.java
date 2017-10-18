@@ -2,12 +2,13 @@ package by.bsuir.ootpsp.task1.models;
 
 import by.bsuir.ootpsp.task1.IDeepCopy;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
 
-public class Person implements IDeepCopy, Comparable {
+public class Person implements IDeepCopy<Person>, Comparable, Serializable {
 
     private static final DateTimeFormatter BIRTH_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
@@ -17,11 +18,11 @@ public class Person implements IDeepCopy, Comparable {
     static final Comparator<Person> BIRTH_DATE_COMPARATOR = Comparator
         .nullsLast(Comparator.comparing(Person::getBirthDate));
 
-    String name;
+    protected String name;
 
-    String surname;
+    protected String surname;
 
-    private LocalDate birthDate;
+    protected LocalDate birthDate;
 
     public Person(String name, String surname, LocalDate birthDate) {
         this.name = name;
@@ -49,7 +50,7 @@ public class Person implements IDeepCopy, Comparable {
             BIRTH_DATE_FORMATTER.format(this.birthDate));
     }
 
-    public Object DeepCopy() {
+    public Person deepCopy() {
         return new Person(this.name, this.surname, this.birthDate);
     }
 
