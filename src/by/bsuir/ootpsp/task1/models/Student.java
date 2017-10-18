@@ -8,15 +8,6 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Stream;
 
-/**
- * В новой версии класса Student сохранить все остальные поля, свойства и
- * методы из предыдущей версии класса, внести необходимые исправления в
- * код свойств и методов из-за изменения типов полей для списков зачетов и
- * экзаменов.
- * Определить вспомогательный класс, реализующий интерфейс
- * System.Collections.Generic.IComparer<Student>, который можно использовать
- * для сравнения объектов типа Student по среднему баллу.
- */
 public class Student extends Person implements Serializable {
 
     public static boolean save(String filename, Student student) {
@@ -197,7 +188,7 @@ public class Student extends Person implements Serializable {
     }
 
     public boolean addFromConsole() {
-        System.out.println("Enter exam data (format - <subject name>#<mark[0 - 10]>#<pass date[DD.MM.YYYY HH:mm:ss]>):");
+        System.out.println("Enter exam data (format - <subject name>#<mark[0 - 10]>#<pass date[D.M.YYYY HH:mm]>):");
         Scanner scanner = new Scanner(System.in);
         String[] data = scanner.nextLine().split("#");
 
@@ -208,6 +199,11 @@ public class Student extends Person implements Serializable {
         }
 
         String subject = data[0];
+        if (subject.trim().isEmpty()) {
+            System.out.println("Invalid subject data");
+    
+            return false;
+        }
 
         if (!data[1].matches("\\d|10")) {
             System.out.println("Invalid mark data");
@@ -218,7 +214,7 @@ public class Student extends Person implements Serializable {
         int mark = Integer.parseInt(data[1]);
 
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("DD.MM.YYYY HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("d.M.y HH:mm");
         LocalDateTime passDate = null;
         try {
             passDate = LocalDateTime.parse(data[2], dtf);
@@ -229,6 +225,7 @@ public class Student extends Person implements Serializable {
         }
 
         this.exams.add(new Exam(subject, mark, passDate));
+        
         return true;
     }
 
